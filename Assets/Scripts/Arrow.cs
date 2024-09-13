@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
-    public readonly float  speed = 3f;
+    public readonly float  speed = 5f;
     public int damage;
     public bool blueSide;
     private bool _enabled;

@@ -30,26 +30,33 @@ public class SideManager : MonoBehaviour
     public float goldTime = 1.5f, goldAnimTime = 0.62f;
     public TextMeshProUGUI goldCostText;
     public Image goldImage;
+    [NonSerialized] public bool finished;
+    [NonSerialized] public Action<MinionController> OnMinionSpawn;
 
     void Awake()
     {
+        Reset();
+        tower.onDamage += OnTowerDamage;
+        tower.onDestroy += OnTowerDeath;
+    }
+
+    public void Reset()
+    {
+        finished = false;
         state = new SideState();
         _defeated = false;
-        goldText.text = state.gold.ToString();
-        state = new SideState();
-        if (!blueSide)
-            EnemySpawn();
+        if(goldText!= null)
+            goldText.text = state.gold.ToString();
         mine.sprite = mineSprites[state.goldMineLV];
-        if (blueSide)
+        if (blueSide && goldImage != null)
         {
             goldImage.sprite = mineSprites[state.goldMineLV + 1];
             goldCostText.text = levelUpCosts[0].ToString();
         }
+        tower.Reset();
         tower.life = SideState.MaxTowerLife;
-        tower.onDamage += OnTowerDamage;
-        tower.onDestroy += OnTowerDeath;
-           
-
+        StopAllCoroutines();
+        StartCoroutine(GetGold());
     }
 
     public void OnTowerDamage()
@@ -59,16 +66,14 @@ public class SideManager : MonoBehaviour
 
     public void OnTowerDeath()
     {
+        finished = true;
         Debug.Log("End game");
     }
-    private void Start()
+
+    public void Finish()
     {
-        StartCoroutine(GetGold());
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        
+        finished = true;
+        _defeated = true;
     }
 
     public IEnumerator GetGold()
@@ -77,7 +82,8 @@ public class SideManager : MonoBehaviour
         {
             yield return new WaitForSeconds(goldTime);
             state.gold += goldAmounts[state.goldMineLV];
-            goldText.text = state.gold.ToString();
+            if(goldText!=null)
+                goldText.text = state.gold.ToString();
             StartCoroutine(GoldSpawn());
         } while (!_defeated);
     }
@@ -92,7 +98,7 @@ public class SideManager : MonoBehaviour
         mine.sprite = mineSprites[state.goldMineLV];
         if (blueSide)
         {
-            if(state.goldMineLV < SideState.MaxMineLevel)
+            if(state.goldMineLV < SideState.MaxMineLevel  && goldImage != null)
             {
                 goldImage.sprite = mineSprites[state.goldMineLV +1];
                 goldCostText.text = levelUpCosts[state.goldMineLV].ToString();
@@ -105,7 +111,8 @@ public class SideManager : MonoBehaviour
         if (amount > state.gold)
             return false;
         state.gold -= amount;
-        goldText.text = state.gold.ToString();
+        if(goldText!=null)
+            goldText.text = state.gold.ToString();
         return true;
     }
     public void EnemySpawn()
@@ -134,6 +141,7 @@ public class SideManager : MonoBehaviour
             minion.transform.Translate(new Vector3(UnityEngine.Random.Range(0.05f, 0.15f) * scale, 0, 0));
         }
         minion.name = minionStats[index].name + "_" + (blueSide ? "blue" : "red");
+        OnMinionSpawn?.Invoke(minion);
     }
 
     public IEnumerator GoldSpawn()

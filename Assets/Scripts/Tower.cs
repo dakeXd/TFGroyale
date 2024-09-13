@@ -10,12 +10,12 @@ public class Tower : MonoBehaviour
     public UnityAction onDamage, onDestroy;
     [NonSerialized] public int life;
     public SpriteRenderer sprite;
-    public Sprite destroyed;
+    public Sprite destroyed, completed;
     private bool _destroyed;
 
     private void Start()
     {
-        _destroyed = false;
+       Reset();
     }
     public void Damage(int amount, float timeOffset = 0, MinionController enemy = null)
     {
@@ -47,6 +47,13 @@ public class Tower : MonoBehaviour
         yield return new WaitForSeconds(0.15f);
         sprite.color = Color.white;
 
+    }
+
+    public void Reset()
+    {
+        _destroyed = false;
+        sprite.sprite = completed;
+        GetComponent<BoxCollider2D>().enabled = true;
     }
 
     public bool IsDestroyed()

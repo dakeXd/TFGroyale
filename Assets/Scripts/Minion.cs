@@ -13,6 +13,7 @@ public class Minion : ScriptableObject
     public float speed;
     public int goldCost;
     public Attack attackType;
+    public float codification;
 }
 
 public enum Attack

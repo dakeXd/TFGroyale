@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Dynamite : MonoBehaviour
 {
-    public readonly float speed = 3f;
+    public readonly float speed = 5f;
     [NonSerialized]  public int damage;
     [NonSerialized]  public bool blueSide;
     private bool _enabled;

@@ -1,26 +1,199 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameInstance : MonoBehaviour
 {
     public bool visualsActive = false;
     public List<GameObject> visuals;
     public SideManager blueSide, redSide;
-    public InputDriver input1, input2;
+    public InputDriver blueInput, redInput;
+    public Transform blueSideStart, redSideStart;
+    public float AIUpdateTime = 0.5f;
+    public bool playerInput = false;
+    private float _nextUpdate = 0f;
+    [NonSerialized] public List<MinionController> blueSideMinions, redSideMinions;
+    
 
+    private void Awake()
+    {
+        UpdateVisuals();
+        blueSideMinions = new List<MinionController>();
+        redSideMinions = new List<MinionController>();
+        blueInput = new BaseAI();
+        redInput = new BaseAI();
+        blueSide.OnMinionSpawn += BlueSideSpawn;
+        redSide.OnMinionSpawn += RedSideSpawn;
+        //INitial offset
+        _nextUpdate = Time.time + AIUpdateTime + Random.Range(0f, AIUpdateTime);
+        Time.timeScale = 3f;
+    }
 
     void Start()
     {
         
     }
 
+    public void Reset()
+    {
+        DeleteUnits();
+        blueSideMinions.Clear();
+        redSideMinions.Clear();
+        _nextUpdate = Time.time + AIUpdateTime + Random.Range(0f, AIUpdateTime);
+        blueSide.Reset();
+        redSide.Reset();
+    }
+
+    private float Normalize(float value, float min, float max, bool clamp = false)
+    {
+        float normValue = (value - min) / (max - min);
+        if (clamp)
+            normValue = Mathf.Clamp01(normValue);
+        return normValue;
+    }
+    public void BlueSideSpawn(MinionController minion)
+    {
+        blueSideMinions.Add(minion);
+    }
+    
+    public void RedSideSpawn(MinionController minion)
+    {
+        redSideMinions.Add(minion);
+    }
+
+    private void UpdateLists()
+    {
+        blueSideMinions.RemoveAll(minion => minion == null || minion.IsDead());
+        redSideMinions.RemoveAll(minion => minion == null || minion.IsDead());
+        blueSideMinions.Sort((a, b) => b.transform.position.x.CompareTo(a.transform.position.x));
+        redSideMinions.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+        /*
+        if(blueSideMinions.Count > 0)
+            Debug.Log(($"First blue {blueSideMinions[0].name}"));
+        if(redSideMinions.Count > 0)
+            Debug.Log(($"First red {redSideMinions[0].name}"));
+        */
+    }
     // Update is called once per frame
     void Update()
     {
-        
+        if (Time.time >= _nextUpdate)
+        {
+            if (CheckEnd())
+            {
+                Debug.Log("Stop updating");
+                blueSide.Finish();
+                redSide.Finish();
+                _nextUpdate = Single.MaxValue; 
+                //DeleteUnits();
+                Invoke(nameof(Reset), 1f);
+                return;
+            }
+                
+            UpdateLists();
+            NetworkInput blue = new NetworkInput();
+            NetworkInput red = new NetworkInput();
+            CalculateInputs(blue, red);
+            if(!playerInput)
+                ProccesAction(blueInput.ProcessInput(blue), true);
+            ProccesAction(redInput.ProcessInput(red), false);
+            //Debug.Log(blueFirstDistance + " , " + redFirstDistance);
+           
+            _nextUpdate = Time.time + AIUpdateTime;
+        }
     }
 
+    private void DeleteUnits()
+    {
+        for (int i = blueSideMinions.Count -1 ; i  >= 0; i--)
+        {
+            Destroy(blueSideMinions[i].gameObject);
+            blueSideMinions.RemoveAt(i);
+        }
+        
+        for (int i = redSideMinions.Count -1 ; i  >= 0; i--)
+        {
+            Destroy(redSideMinions[i].gameObject);
+            redSideMinions.RemoveAt(i);
+        }
+    }
+    private bool CheckEnd()
+    {
+        return (blueSide.finished || redSide.finished);
+
+    }
+
+    private void ProccesAction(AiAction action, bool blue)
+    {
+        SideManager side = blue ? blueSide : redSide;
+        switch (action)
+        {
+            case AiAction.None:
+                break;
+            case AiAction.Mine:
+                side.LevelUpMine();
+                break;
+            case AiAction.Pawn:
+                side.SpawnMinion(2);
+                break;
+            case AiAction.Torch:
+                side.SpawnMinion(3);
+                break;
+            case AiAction.Archer:
+                side.SpawnMinion(1);
+                break;
+            case AiAction.TNT:
+                side.SpawnMinion(4);
+                break;
+            case AiAction.Knight:
+                side.SpawnMinion(0);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(action), action, null);
+        }
+    }
+    public void CalculateInputs(  NetworkInput blue,   NetworkInput red)
+    {
+        float blueFirstDistance = blueSideMinions.Count > 0
+            ? Normalize(blueSideMinions[0].transform.position.x, blueSideStart.position.x, redSideStart.position.x)
+            : 0;
+        float redFirstDistance = redSideMinions.Count > 0
+            ? Normalize(redSideMinions[0].transform.position.x, redSideStart.position.x, blueSideStart.position.x)
+            : 0;
+        float[] allys = new float[5];
+        float[] enemys = new float[5];
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < blueSideMinions.Count)
+                allys[i] = blueSideMinions[i].stats.codification;
+            else
+                allys[i] = 0;
+            
+            if (i < redSideMinions.Count)
+                enemys[i] = redSideMinions[i].stats.codification;
+            else
+                enemys[i] = 0;
+        }
+        
+        //blue
+        blue.gold = Normalize(blueSide.state.gold, 0f, 1000f, true);
+        blue.enemyGold = Normalize(redSide.state.gold, 0f, 1000f, true);
+        blue.mineLv = Normalize(blueSide.state.goldMineLV, 0f, 2f);
+        blue.allyDistance = blueFirstDistance;
+        blue.enemyDistance = redFirstDistance;
+        blue.UnitsFromArray(allys, enemys);
+        
+        //red
+        red.gold = Normalize(redSide.state.gold, 0f, 1000f, true);
+        red.enemyGold = Normalize(blueSide.state.gold, 0f, 1000f, true);
+        red.mineLv = Normalize(redSide.state.goldMineLV, 0f, 2f);
+        red.allyDistance = redFirstDistance;
+        red.enemyDistance = blueFirstDistance;
+        red.UnitsFromArray(enemys, allys);
+       
+    }
     [ContextMenu("Update visuals")]
     public void UpdateVisuals()
     {

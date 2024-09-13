@@ -20,3 +20,4 @@ MonoBehaviour:
   speed: 2.5
   goldCost: 150
   attackType: 2
+  codification: 0.8

@@ -6,17 +6,97 @@ public class BaseAI : InputDriver
 {
     private ActionProbs probs;
 
-    private void Start()
+    public BaseAI()
     {
         probs = new ActionProbs();
     }
+
     public override AiAction ProcessInput(NetworkInput input)
     {
         probs.Reset();
-        //DO something
+        UpdateProbs(input);
         return probs.Choose();
     }
 
+    private void UpdateProbs(NetworkInput input)
+    {
+        //None
+        probs.noneProb = 10;
+        if (input.enemyDistance > 0.5f)
+            probs.noneProb -= 1;
+        else
+        {
+            if(input.gold < 0.2f)
+                probs.noneProb += 9;
+        }
+        if (input.enemyDistance > 0.8f)
+            probs.noneProb -= 1;
+        if (input.allyDistance > 0.7f)
+            probs.noneProb++;
+        if (input.gold < 0.1f)
+            probs.noneProb += 5;
+        if (input.a5 > 0.01f)
+            probs.noneProb += 10;
+        //Mine
+        if (input.mineLv >= 0.99f)
+            probs.mineProb = 0;
+        else
+        {
+            if (input.mineLv < 0.3f && input.gold > 0.3f)
+            {
+                probs.mineProb += 10;
+            }
+
+            if (input.mineLv < 0.9f && input.gold > 0.6f)
+            {
+                probs.mineProb += 10;
+            }
+
+            //si el enemigo esta cerca
+            if (input.enemyDistance > 0.7f)
+                probs.mineProb -= 2;
+            //Si el enemigo tiene unidades y nosotros no
+            if (input.a1 < 0.01f && input.e1 > 0.01f)
+                probs.mineProb -= 4;
+        }
+
+       
+        if (input.enemyDistance > 0.9f && input.a1 < 0.01f && input.gold < 0.07f)
+            probs.pawnProb += 2;
+        if (input.a3 > 0)
+            probs.pawnProb--;
+
+        if (input.gold < 0.15f)
+            probs.archerProb++;
+        if (input.enemyDistance < 0.3f)
+            probs.archerProb ++;
+        if (input.enemyDistance > 0.8f && input.a1 < 0.01f)
+            probs.archerProb--;
+
+        if (input.e1 is > 0.5f and < 0.7f)
+            probs.torchProb += 3;
+
+        if (input.e3 > 0f)
+            probs.tntProb += 3;
+
+        if (input.e5 > 0f)
+        {
+            probs.pawnProb--;
+            probs.tntProb += 5;
+        }
+        if (input.gold > 0.2f)
+            probs.knightProb += 3;
+        
+        if (input.gold < 0.1f)
+            probs.archerProb = 0;
+        if (input.gold < 0.06f)
+            probs.pawnProb = 0;
+        if (input.gold < 0.2f)
+            probs.knightProb = 0;
+        if (input.gold < 0.15f){}
+            probs.tntProb = probs.torchProb = 0;
+ 
+    }
     private class ActionProbs
     {
         public int noneProb;
@@ -93,7 +173,7 @@ public enum AiAction
 }
 public class NetworkInput
 {
-    public float gold;
+    public float gold; //0-1000
     public float enemyGold;
     public float allyDistance;
     public float enemyDistance;
@@ -106,6 +186,19 @@ public class NetworkInput
         return new float[] { gold, enemyGold, allyDistance, enemyDistance, e1, e2, e3, e4, e5, a1, a2, a3, a4, a5, mineLv}; 
     }
 
+    public void UnitsFromArray(float[] allys, float[] enemys)
+    {
+        e1 = allys[0];
+        e2 = allys[1];
+        e3= allys[2];
+        e4 = allys[3];
+        e5 = allys[4];
+        a1 = enemys[0];
+        a2  = enemys[1];
+        a3  = enemys[2];
+        a4  = enemys[3];
+        a5  = enemys[4];
+    }
     public void FromArray(float[] inputs)
     {
         gold = inputs[0];

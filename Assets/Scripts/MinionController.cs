@@ -11,7 +11,7 @@ public class MinionController : MonoBehaviour
     public Rigidbody2D rb;
     public bool blueSide;
     private int _actualLife;
-    public readonly float Speed = 0.9f; 
+    public readonly float Speed = 1.2f; 
     public readonly float allyDetectDistnace = 0.5f;
     //private Vector3 _lastPos;
     public LayerMask attackObjetives;
@@ -96,6 +96,9 @@ public class MinionController : MonoBehaviour
             {
                 if (allyHit.transform.gameObject.GetComponent<Tower>().blueSide != blueSide)
                     return false;
+            }else if (allyHit.transform.CompareTag("Block"))
+            {
+                return false;
             }
         }
         return true;
@@ -273,7 +276,7 @@ public class MinionController : MonoBehaviour
         Debug.DrawLine(new Vector3(rect.x, rect.y), new Vector3(rect.x, rect.y + rect.height), Color.red);
         Debug.DrawLine(new Vector3(rect.x + rect.width, rect.y + rect.height), new Vector3(rect.x + rect.width, rect.y), Color.green);
         Debug.DrawLine(new Vector3(rect.x + rect.width, rect.y + rect.height), new Vector3(rect.x, rect.y + rect.height), Color.red);
-    }ç*/
+    }ï¿½*/
     private IEnumerator MeleeSingleAttack(MinionController minion)
     {
         //Si se esta atacando parar
