@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Arrow : MonoBehaviour
+public class Arrow : Poolable
 {
     public readonly float  speed = 5f;
     public int damage;
@@ -13,10 +13,16 @@ public class Arrow : MonoBehaviour
 
     private void Awake()
     {
+        
+    }
+/*
+    public override void Active()
+    {
+        base.Active();
         _enabled = true;
         _elapsedDistance = 0;
     }
-
+*/
     private void FixedUpdate()
     {
         if (!enabled)
@@ -29,7 +35,7 @@ public class Arrow : MonoBehaviour
         }
         int mult = blueSide ? 1 : -1;
         transform.Translate(new Vector3(speed * mult * Time.fixedDeltaTime, 0, 0));
-        _elapsedDistance += speed * mult * Time.fixedDeltaTime;
+        _elapsedDistance += Mathf.Abs( speed * mult * Time.fixedDeltaTime);
        
     }
     private void OnTriggerEnter2D(Collider2D collision)

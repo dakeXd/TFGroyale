@@ -12,6 +12,7 @@ public class GameInstance : MonoBehaviour
     public InputDriver blueInput, redInput;
     public Transform blueSideStart, redSideStart;
     public float AIUpdateTime = 0.5f;
+    public int AI_Type = -1;
     public bool playerInput = false;
     private float _nextUpdate = 0f;
     [NonSerialized] public List<MinionController> blueSideMinions, redSideMinions;
@@ -22,13 +23,15 @@ public class GameInstance : MonoBehaviour
         UpdateVisuals();
         blueSideMinions = new List<MinionController>();
         redSideMinions = new List<MinionController>();
-        blueInput = new BaseAI();
-        redInput = new BaseAI();
+        if(blueInput==null)
+            blueInput = new BaseAI();
+        if(redInput == null)
+            redInput = new BaseAI();
         blueSide.OnMinionSpawn += BlueSideSpawn;
         redSide.OnMinionSpawn += RedSideSpawn;
         //INitial offset
         _nextUpdate = Time.time + AIUpdateTime + Random.Range(0f, AIUpdateTime);
-        Time.timeScale = 3f;
+        //Time.timeScale = 3f;
     }
 
     void Start()
@@ -77,18 +80,34 @@ public class GameInstance : MonoBehaviour
         */
     }
     // Update is called once per frame
+
+    public void UpdateFitness()
+    {
+        
+        blueInput.UpdateFitness(new NetworkStats(1000-redSide.state.towerLife, 1000-blueSide.state.towerLife, redSide.state.towerLife <= 0));
+        Debug.Log($"{gameObject.name} AI{AI_Type}: Inflicted {(1000- redSide.state.towerLife).ToString()} Received {(1000- blueSide.state.towerLife).ToString()} Victory {(redSide.state.towerLife <= 0).ToString()}  Fitness: {blueInput.GetFitness().ToString()}");
+        //Solo se testea el blue
+        //redInput.UpdateFitness(new NetworkStats(1000-blueSide.state.towerLife, 1000-redSide.state.towerLife, blueSide.finished));
+    }
+
+    public void ResetFitness()
+    {
+        blueInput.Reset();
+        redInput.Reset();
+    }
     void Update()
     {
         if (Time.time >= _nextUpdate)
         {
             if (CheckEnd())
             {
-                Debug.Log("Stop updating");
+                //Debug.Log("Stop updating");
                 blueSide.Finish();
                 redSide.Finish();
+               
                 _nextUpdate = Single.MaxValue; 
-                //DeleteUnits();
-                Invoke(nameof(Reset), 1f);
+                DeleteUnits();
+                //Invoke(nameof(Reset), 1f);
                 return;
             }
                 
@@ -101,7 +120,8 @@ public class GameInstance : MonoBehaviour
             ProccesAction(redInput.ProcessInput(red), false);
             //Debug.Log(blueFirstDistance + " , " + redFirstDistance);
            
-            _nextUpdate = Time.time + AIUpdateTime;
+            //Si el juego esta acelerado la decision se tomara antes.
+            _nextUpdate = Time.time + (AIUpdateTime / Time.timeScale);
         }
     }
 

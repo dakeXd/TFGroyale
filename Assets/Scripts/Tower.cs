@@ -35,8 +35,10 @@ public class Tower : MonoBehaviour
                 yield break;
         }
         sprite.color = Color.red;
-        onDamage?.Invoke();
+        
         life -= amount;
+        life = life < 0 ? 0 : life;
+        onDamage?.Invoke();
         if (life <= 0)
         {
             _destroyed = true;

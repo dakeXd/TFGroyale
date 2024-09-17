@@ -15,7 +15,7 @@ MonoBehaviour:
   bodyBlueSide: {fileID: 9100000, guid: 1c2d33ff544ae8c4aadc4289d6ba134b, type: 2}
   bodyRedSide: {fileID: 9100000, guid: 9228f4449319a0c4e87ab58d41931331, type: 2}
   maxLife: 100
-  attack: 90
+  attack: 75
   range: 5
   speed: 2
   goldCost: 100

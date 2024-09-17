@@ -66,8 +66,9 @@ public class MinionController : MonoBehaviour
     {
         if (_attacking || _dead)
             return false;
-        Vector2 rayStart = new Vector2(transform.position.x, 0.5f);
+        Vector2 rayStart = new Vector2(transform.position.x, transform.position.y + 0.75f);
         var hitAlly = Physics2D.RaycastAll(rayStart, blueSide ? Vector2.right : Vector2.left, allyDetectDistnace, attackObjetives);
+        //Debug.DrawRay(rayStart, blueSide ? Vector2.right : Vector2.left);
         foreach (var allyHit in hitAlly)
         {
             if (allyHit.transform.CompareTag("BlockUnit"))
@@ -106,7 +107,7 @@ public class MinionController : MonoBehaviour
     public bool CheckEnemies()
     {
 
-        Vector2 rayStart = new Vector2(transform.position.x, 0.5f);
+        Vector2 rayStart = new Vector2(transform.position.x, transform.position.y + 0.75f);
         var hit = Physics2D.RaycastAll(rayStart, blueSide ? Vector2.right : Vector2.left, stats.range, attackObjetives);
         //Debug.DrawRay(rayStart, blueSide ? Vector2.right : Vector2.left, Color.red);
         

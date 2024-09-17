@@ -67,7 +67,7 @@ public class SideManager : MonoBehaviour
     public void OnTowerDeath()
     {
         finished = true;
-        Debug.Log("End game");
+        //Debug.Log(transform.parent.parent.name + " end game " + (blueSide ? "Red side wins" : "Blue side wins"));
     }
 
     public void Finish()
@@ -87,7 +87,7 @@ public class SideManager : MonoBehaviour
             StartCoroutine(GoldSpawn());
         } while (!_defeated);
     }
-
+    
     public void LevelUpMine()
     {
         if (state.goldMineLV >= SideState.MaxMineLevel)

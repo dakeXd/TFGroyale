@@ -11,13 +11,28 @@ public class BaseAI : InputDriver
         probs = new ActionProbs();
     }
 
-    public override AiAction ProcessInput(NetworkInput input)
+    public AiAction ProcessInput(NetworkInput input)
     {
         probs.Reset();
         UpdateProbs(input);
         return probs.Choose();
     }
 
+    public void UpdateFitness(NetworkStats stats)
+    {
+        return;
+    }
+
+    public void Reset()
+    {
+        probs.Reset();
+    }
+
+    public float GetFitness()
+    {
+        return 0;
+    }
+    
     private void UpdateProbs(NetworkInput input)
     {
         //None
@@ -184,6 +199,11 @@ public class NetworkInput
     public float[] AsArray()
     {
         return new float[] { gold, enemyGold, allyDistance, enemyDistance, e1, e2, e3, e4, e5, a1, a2, a3, a4, a5, mineLv}; 
+    }
+    
+    public double[] AsDoubleArray()
+    {
+        return new double[] { gold, enemyGold, allyDistance, enemyDistance, e1, e2, e3, e4, e5, a1, a2, a3, a4, a5, mineLv}; 
     }
 
     public void UnitsFromArray(float[] allys, float[] enemys)
