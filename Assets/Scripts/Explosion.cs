@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Explosion : MonoBehaviour
+public class Explosion : Poolable
 {
     public float explosionArea;
     public float explosionTime, explosionTimeDMG;
@@ -14,15 +14,11 @@ public class Explosion : MonoBehaviour
     public GameObject visuals;
     public Transform raycaster;
 
-    void Start()
-    {
-        StartCoroutine(ExplosionCR());
-    }
 
-    // Update is called once per frame
-    void Update()
+    public override void Active()
     {
-        
+        base.Active();
+        StartCoroutine(ExplosionCR());
     }
 
     public IEnumerator ExplosionCR()
@@ -50,6 +46,6 @@ public class Explosion : MonoBehaviour
         }
         yield return new WaitForSeconds(explosionTime - explosionTimeDMG);
         visuals.SetActive(false);
-        Destroy(gameObject);
+        Remove();
     }
 }

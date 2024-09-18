@@ -10,19 +10,22 @@ public class Arrow : Poolable
     private bool _enabled;
     public float maxDistance;
     private float _elapsedDistance;
+    
 
-    private void Awake()
-    {
-        
-    }
-/*
     public override void Active()
     {
         base.Active();
         _enabled = true;
         _elapsedDistance = 0;
     }
-*/
+    
+    
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        _enabled = false;
+    }
+
     private void FixedUpdate()
     {
         if (!enabled)
@@ -30,8 +33,7 @@ public class Arrow : Poolable
 
         if (_elapsedDistance >= maxDistance)
         {
-            _enabled = false;
-            Destroy(gameObject);
+            Remove();
         }
         int mult = blueSide ? 1 : -1;
         transform.Translate(new Vector3(speed * mult * Time.fixedDeltaTime, 0, 0));
@@ -48,16 +50,14 @@ public class Arrow : Poolable
             if (minion.blueSide == blueSide)
                 return;
             minion.Damage(damage, 0.1f);
-            _enabled = false;
-            Destroy(gameObject);
+            Remove();
         }else if (collision.CompareTag("Building"))
         {
             var tower = collision.gameObject.GetComponentInParent<Tower>();
             if (tower.blueSide == blueSide)
                 return;
             tower.Damage(damage, 0.1f);
-            _enabled = false;
-            Destroy(gameObject);
+            Remove();
         }
     }
 }

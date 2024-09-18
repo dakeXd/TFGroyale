@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class ObjectPooler : MonoBehaviour
 {
-
     public Poolable prefab;
     public List<Poolable> pooledItems;
-    
+
+    private void Awake()
+    {
+        pooledItems = new List<Poolable>(128);
+    }
+
     // Start is called before the first frame update
     public Poolable GetItem()
     {
@@ -20,7 +24,8 @@ public class ObjectPooler : MonoBehaviour
         }
         else
         {
-            var item = Instantiate(prefab);
+            //Debug.Log("Creating new poolable");
+            var item = Instantiate(prefab, transform);
             item.pooler = this;
             item.Active();
             return item;

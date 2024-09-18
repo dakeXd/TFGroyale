@@ -16,8 +16,7 @@ public class MinionController : MonoBehaviour
     //private Vector3 _lastPos;
     public LayerMask attackObjetives;
     private bool _dead, _moving, _attacking;
-    public Arrow arrowPrefab;
-    public Dynamite dynamitePrefab;
+    //public Dynamite dynamitePrefab;
     private readonly float arrowTime = 0.5f;
     private readonly float dynamiteTime = 0.4f;
     void Start()
@@ -315,7 +314,9 @@ public class MinionController : MonoBehaviour
         yield return new WaitForSeconds(arrowTime);
         if (_dead)
             yield break;
-        var arrow = Instantiate(arrowPrefab, transform.position, transform.rotation, null);
+        var arrow = (Arrow)GameManager.Instance.ArrowPooler.GetItem(); //(Instantiate(arrowPrefab, transform.position, transform.rotation, null);
+        arrow.transform.position = transform.position;
+        arrow.transform.rotation = transform.rotation;
         arrow.transform.localScale = transform.localScale;
         arrow.damage = stats.attack;
         arrow.blueSide = blueSide;
@@ -336,7 +337,9 @@ public class MinionController : MonoBehaviour
         yield return new WaitForSeconds(dynamiteTime);
         if (_dead)
             yield break;
-        var arrow = Instantiate(dynamitePrefab, transform.position, transform.rotation, null);
+        var arrow = (Dynamite )GameManager.Instance.DynamitePooler.GetItem(); 
+        arrow.transform.position = transform.position;
+        arrow.transform.rotation = transform.rotation;
         arrow.transform.localScale = transform.localScale;
         arrow.damage = stats.attack;
         arrow.blueSide = blueSide;

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dynamite : MonoBehaviour
+public class Dynamite : Poolable
 {
     public readonly float speed = 5f;
     [NonSerialized]  public int damage;
@@ -11,14 +11,23 @@ public class Dynamite : MonoBehaviour
     private bool _enabled;
     [NonSerialized]  public float maxDistance;
     private float _elapsedDistance;
-    public Explosion explosion;
+    //public Explosion explosion;
 
 
-    private void Awake()
+    public override void Active()
     {
+        base.Active();
         _enabled = true;
         _elapsedDistance = 0;
     }
+    
+    
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        _enabled = false;
+    }
+    
 
     private void FixedUpdate()
     {
@@ -57,11 +66,13 @@ public class Dynamite : MonoBehaviour
     {
         if (!_enabled)
             return;
-        var item = Instantiate(explosion, transform.position, transform.rotation);
+        //var item = Instantiate(explosion, transform.position, transform.rotation);
+        var item = (Explosion)GameManager.Instance.ExplosionPooler.GetItem(); 
+        item.transform.position = transform.position;
+        item.transform.rotation = transform.rotation;
         item.transform.localScale = transform.localScale;
         item.blueSide = blueSide;
         item.damage = damage;
-        _enabled = false;
-        Destroy(gameObject);
+        Remove();
     }
 }

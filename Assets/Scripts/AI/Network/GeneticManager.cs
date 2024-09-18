@@ -109,14 +109,15 @@ public class GeneticManager : MonoBehaviour
                 if(((EnemyNeuralNetwork)instance.blueInput).network.Equals(enemyAI3[0]))
                     Debug.Log(instance.gameObject.name);
             }
+            WriteNetworks(5, 0);
+            WriteNetworks(5, 1);
+            WriteNetworks(5, 2);
             GetBestNetworks();
             NextGeneration(0);
             NextGeneration(1);
             NextGeneration(2);
         }
-        WriteNetworks(5, 0);
-        WriteNetworks(5, 1);
-        WriteNetworks(5, 2);
+        
     }
     
     private void Sort()
