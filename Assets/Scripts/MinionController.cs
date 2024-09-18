@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class MinionController : MonoBehaviour
+public class MinionController : Poolable
 {
 
     public Minion stats;
@@ -19,12 +19,25 @@ public class MinionController : MonoBehaviour
     //public Dynamite dynamitePrefab;
     private readonly float arrowTime = 0.5f;
     private readonly float dynamiteTime = 0.4f;
+    /*
     void Start()
     {
         animator.SetAnimator(blueSide ? stats.bodyBlueSide : stats.bodyRedSide);
         _actualLife = stats.maxLife;
         _dead = _moving = _attacking = false;
         //_lastPos = transform.position;
+    }*/
+    
+    public override void Active()
+    {
+        base.Active();
+        _dead = _moving = _attacking = false;
+    }
+
+    public void UpdateAnimator()
+    {
+        _actualLife = stats.maxLife;
+        animator.SetAnimator(blueSide ? stats.bodyBlueSide : stats.bodyRedSide);
     }
 
     
@@ -204,7 +217,8 @@ public class MinionController : MonoBehaviour
             _dead = true;
             Death();
             yield return new WaitForSeconds(animator.deathTime);
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            Remove();
         }
     }
 

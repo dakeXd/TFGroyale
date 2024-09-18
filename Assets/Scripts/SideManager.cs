@@ -19,7 +19,7 @@ public class SideManager : MonoBehaviour
     [SerializeField] private Sprite[] mineSprites;
     //[SerializeField] private Sprite towerUp, towerDown, castleUp, castleDown;
     [Header("Minions")]
-    [SerializeField] private MinionController minionPrefab;
+    //[SerializeField] private MinionController minionPrefab;
     [SerializeField] private List<Minion> minionStats;
     private bool _defeated;
    
@@ -126,7 +126,11 @@ public class SideManager : MonoBehaviour
             return;
         if (!Buy(minionStats[index].goldCost))
             return;
-        var minion = Instantiate(minionPrefab, spawnPoint1);
+        //var minion = Instantiate(minionPrefab, spawnPoint1);
+        var minion = (MinionController)GameManager.Instance.MinionPooler.GetItem();
+        minion.transform.parent = spawnPoint1;
+        minion.transform.position = spawnPoint1.transform.position;
+        minion.transform.rotation = spawnPoint1.transform.rotation;
         minion.stats = minionStats[index];
         minion.blueSide = blueSide;
         if (!blueSide)
@@ -141,6 +145,7 @@ public class SideManager : MonoBehaviour
             minion.transform.Translate(new Vector3(UnityEngine.Random.Range(0.05f, 0.15f) * scale, 0, 0));
         }
         minion.name = minionStats[index].name + "_" + (blueSide ? "blue" : "red");
+        minion.UpdateAnimator();
         OnMinionSpawn?.Invoke(minion);
     }
 

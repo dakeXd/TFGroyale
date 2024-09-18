@@ -3363,6 +3363,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1469504100}
+  - component: {fileID: 1469504101}
   m_Layer: 0
   m_Name: MinionPooler
   m_TagString: Untagged
@@ -3385,6 +3386,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1612894812}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1469504101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469504099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f16a786fb4e19a47871ca9c0cab0ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 852023446896448354, guid: ac3a20c94d50a7c46a25ed98f26e62f6, type: 3}
+  pooledItems: []
 --- !u!1 &1476726611
 GameObject:
   m_ObjectHideFlags: 0
@@ -3562,7 +3577,7 @@ MonoBehaviour:
   ArrowPooler: {fileID: 1084883525}
   DynamitePooler: {fileID: 1276991043}
   ExplosionPooler: {fileID: 155048915}
-  MinionPooler: {fileID: 0}
+  MinionPooler: {fileID: 1469504101}
 --- !u!4 &1612894812
 Transform:
   m_ObjectHideFlags: 0

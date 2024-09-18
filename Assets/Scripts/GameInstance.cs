@@ -129,13 +129,15 @@ public class GameInstance : MonoBehaviour
     {
         for (int i = blueSideMinions.Count -1 ; i  >= 0; i--)
         {
-            Destroy(blueSideMinions[i].gameObject);
+            //Destroy(blueSideMinions[i].gameObject);
+            blueSideMinions[i].Remove();
             blueSideMinions.RemoveAt(i);
         }
         
         for (int i = redSideMinions.Count -1 ; i  >= 0; i--)
         {
-            Destroy(redSideMinions[i].gameObject);
+            //Destroy(redSideMinions[i].gameObject);
+            redSideMinions[i].Remove();
             redSideMinions.RemoveAt(i);
         }
     }
