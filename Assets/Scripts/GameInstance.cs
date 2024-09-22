@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using AI.Network;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,8 +19,8 @@ public class GameInstance : MonoBehaviour
     public bool playerInput = false;
     private float _nextUpdate = 0f;
     [NonSerialized] public List<MinionController> blueSideMinions, redSideMinions;
+    public TextAsset AI1, AI2, AI3;
     
-
     private void Awake()
     {
         UpdateVisuals();
@@ -27,13 +30,51 @@ public class GameInstance : MonoBehaviour
             blueInput = new BaseAI();
         if(redInput == null)
             redInput = new BaseAI();
+        if (playerInput && AI_Type >= 0)
+        {
+            var net = ReadNetworks(AI_Type);
+            redInput = new EnemyNeuralNetwork(net);
+        }
         blueSide.OnMinionSpawn += BlueSideSpawn;
         redSide.OnMinionSpawn += RedSideSpawn;
         //INitial offset
         _nextUpdate = Time.time + AIUpdateTime + Random.Range(0f, AIUpdateTime);
         //Time.timeScale = 3f;
     }
+    public GeneticNetwork ReadNetworks(int ai)
+    {
+        GeneticNetwork network = new GeneticNetwork(GeneticManager.Layers, Activation.Sigmoid, Activation.Sigmoid);
 
+        string AiText = "";
+        switch (ai)
+        {
+            case 0:
+
+                AiText = AI1.text;
+                break;
+            case 1:
+  
+                AiText = AI2.text;
+                break;
+            case 2:
+
+                AiText = AI3.text;
+                break;
+            default:
+                Debug.LogError("Inexpected AI index " + ai);
+                return null;
+        }
+        Debug.Log(AiText);
+        string[] lines = AiText.Split("\n");
+        var line = lines[0].Split(',');
+        double[] coded = new double[line.Length];
+        for (int i = 0; i < line.Length; i++)
+        {
+            coded[i] = Double.Parse(line[i], CultureInfo.InvariantCulture);
+        }
+        network.Decode(coded);
+        return network;
+    }
     void Start()
     {
         
@@ -219,6 +260,8 @@ public class GameInstance : MonoBehaviour
     [ContextMenu("Update visuals")]
     public void UpdateVisuals()
     {
+        blueSide.visualActive = visualsActive;
+        redSide.visualActive = visualsActive;
         foreach(var item in visuals)
         {
             item.SetActive(visualsActive);

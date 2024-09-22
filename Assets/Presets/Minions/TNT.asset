@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bodyBlueSide: {fileID: 9100000, guid: d76e4bf0a6a18b241957be0d39ad9f30, type: 2}
   bodyRedSide: {fileID: 9100000, guid: bd228eed819c77d44b6d0af78c8b6c55, type: 2}
-  maxLife: 100
+  maxLife: 160
   attack: 75
   range: 3
   speed: 2.5

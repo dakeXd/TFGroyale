@@ -11,7 +11,7 @@ public class MinionController : Poolable
     public Rigidbody2D rb;
     public bool blueSide;
     private int _actualLife;
-    public readonly float Speed = 1.2f; 
+    public readonly float Speed = 1.7f; 
     public readonly float allyDetectDistnace = 0.5f;
     //private Vector3 _lastPos;
     public LayerMask attackObjetives;
@@ -19,6 +19,11 @@ public class MinionController : Poolable
     //public Dynamite dynamitePrefab;
     private readonly float arrowTime = 0.5f;
     private readonly float dynamiteTime = 0.4f;
+    private RaycastHit2D[] m_Results = new RaycastHit2D[15];
+    private Collider2D[] m_ResultsC = new Collider2D[15];
+    [NonSerialized] public bool visualsActive = true;
+
+    private GameInstance _instance;
     /*
     void Start()
     {
@@ -32,32 +37,46 @@ public class MinionController : Poolable
     {
         base.Active();
         _dead = _moving = _attacking = false;
+        visualsActive = true;
+        
+        GetComponentInChildren<BoxCollider2D>().enabled = true;
     }
 
-    public void UpdateAnimator()
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        transform.localScale = Vector3.one;
+    }
+
+    public void UpdatePooledParameters()
     {
         _actualLife = stats.maxLife;
+        _instance = GetComponentInParent<GameInstance>();
+        animator.Show();
         animator.SetAnimator(blueSide ? stats.bodyBlueSide : stats.bodyRedSide);
+        animator.SetStatic(visualsActive);
     }
 
     
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (_dead)
             return;
 
-        WalkAction();
         CheckEnemies();
+        WalkAction();
+        
     }
 
     public void WalkAction()
     {
         if (_attacking || _dead)
             return;
-        if (CheckCanWalk())
+        Transform closest;
+        if (CheckCanWalk(out closest))
         {
-            Movement();
+            Movement(closest);
             if (!_moving)
             {
                 _moving = true;
@@ -74,114 +93,254 @@ public class MinionController : Poolable
         }
     }
 
-    public bool CheckCanWalk()
+    private Vector3 pos, enemyPos;
+    public bool CheckCanWalk(out Transform closest)
     {
+        closest = null;
         if (_attacking || _dead)
             return false;
-        Vector2 rayStart = new Vector2(transform.position.x, transform.position.y + 0.75f);
-        var hitAlly = Physics2D.RaycastAll(rayStart, blueSide ? Vector2.right : Vector2.left, allyDetectDistnace, attackObjetives);
-        //Debug.DrawRay(rayStart, blueSide ? Vector2.right : Vector2.left);
-        foreach (var allyHit in hitAlly)
+        pos = transform.position;
+        /*
+        Tower enemyTower = blueSide ?_instance.redSide.tower : _instance.blueSide.tower;
+        if (Vector2.Distance(enemyTower.transform.position, transform.position) < allyDetectDistnace)
+            return false;
+        */
+        //Only check allys
+        var minionCollection = blueSide ? _instance.blueSideMinions : _instance.redSideMinions;
+        MinionController minion;
+        float minDistance = Mathf.Infinity;
+        for (int i = 0; i < minionCollection.Count; i++)
         {
-            if (allyHit.transform.CompareTag("BlockUnit"))
+            minion = minionCollection[i];
+            if(minion.IsDead() || minion == this)
+                continue;
+            enemyPos = minion.transform.position;
+            if (blueSide && enemyPos.x > pos.x || !blueSide && enemyPos.x < pos.x)
             {
-                var minion = allyHit.transform.gameObject.GetComponentInParent<MinionController>();
+                var distance = Vector2.Distance(pos, enemyPos);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closest = minion.transform;
+                }
+                if (distance <= allyDetectDistnace)
+                {
+                    return false;
+                }
+            }
+        }
+     
+        
+        /*
+        foreach (var minion in _instance.redSideMinions)
+        {
+            if(minion.IsDead() || minion == this)
+                continue;
+            var minionPos = minion.transform.position;
+            if (blueSide && minionPos.x > pos.x || !blueSide && minionPos.x < pos.x)
+            {
+                if (Vector2.Distance(pos, minionPos) < allyDetectDistnace)
+                    return false;
+            }
+        }*/
+        
+        /*
+        //Vector2 rayStart = new Vector2(transform.position.x, transform.position.y + 0.75f);
+        //var hitAlly = Physics2D.RaycastAll(rayStart, blueSide ? Vector2.right : Vector2.left, allyDetectDistnace, attackObjetives);
+        int hits = Physics2D.RaycastNonAlloc(rayStart, blueSide ? Vector2.right : Vector2.left, m_Results, allyDetectDistnace, attackObjetives);
+        //Debug.DrawRay(rayStart, blueSide ? Vector2.right : Vector2.left);
+        for (int i = 0; i < hits ; i++)
+        {
+            var hit_t = m_Results[i].transform;
+          
+            if (hit_t.CompareTag("BlockUnit"))
+            {
+                var minion = hit_t.gameObject.GetComponentInParent<MinionController>();
                 if (minion.blueSide != blueSide)
                 {
                     return false;
                 }
                 if (blueSide)
                 {
-                    if (allyHit.transform.position.x > transform.position.x)
+                    if (hit_t.position.x > transform.position.x)
                     {
                         return false;
                     }
                 }
                 else
                 {
-                    if (allyHit.transform.position.x < transform.position.x)
+                    if (hit_t.position.x < transform.position.x)
                     {
                         return false;
                     }
                 }
             }
-            else if (allyHit.transform.CompareTag("Building"))
+            else if (hit_t.CompareTag("Building"))
             {
-                if (allyHit.transform.gameObject.GetComponent<Tower>().blueSide != blueSide)
+                if (hit_t.gameObject.GetComponent<Tower>().blueSide != blueSide)
                     return false;
-            }else if (allyHit.transform.CompareTag("Block"))
+            }else if (hit_t.CompareTag("Block"))
             {
                 return false;
             }
         }
+        */
         return true;
     }
     public bool CheckEnemies()
     {
-
-        Vector2 rayStart = new Vector2(transform.position.x, transform.position.y + 0.75f);
-        var hit = Physics2D.RaycastAll(rayStart, blueSide ? Vector2.right : Vector2.left, stats.range, attackObjetives);
-        //Debug.DrawRay(rayStart, blueSide ? Vector2.right : Vector2.left, Color.red);
+        if (_attacking || _dead)
+            return false;
         
+        pos = transform.position;
+        float closestDistance = Mathf.Infinity;
+        MinionController closestT = null;
+        var minionCollection = blueSide ? _instance.redSideMinions : _instance.blueSideMinions;
+        float distance;
+        for (int i = 0; i < minionCollection.Count; i++)
+        {
+            if(minionCollection[i].IsDead())
+                continue;
+            enemyPos = minionCollection[i].transform.position;
+            distance = Vector2.Distance(pos, enemyPos);
+            if (distance < closestDistance && distance < stats.range)
+            {
+                closestDistance = distance;
+                closestT = minionCollection[i];
+            }
+        }
+
+        if (closestT == null)
+        {
+            Tower enemyTower = blueSide ?_instance.redSide.tower : _instance.blueSide.tower;
+            if (Mathf.Abs((enemyTower.transform.position.x + (blueSide ? 0.3f : -0.3f))- pos.x) < stats.range)
+            {
+                switch (stats.attackType)
+                {
+                    case Attack.Melee:
+                        
+                        StartCoroutine(MeleeSingleAttack(enemyTower));
+                        break;
+                    case Attack.Arrow:
+                        StartCoroutine(ArrowAttack());
+                        break;
+                    case Attack.TNT:
+                        StartCoroutine(TNTAttack());
+                        break;
+                      
+                }
+
+                return true;
+            }
+            return false;
+        }
+        else
+        {
+            switch (stats.attackType)
+            {
+                case Attack.Melee:
+                    StartCoroutine(MeleeSingleAttack(closestT));
+                    break;
+                case Attack.Arrow:
+                    StartCoroutine(ArrowAttack());
+                    break;
+                case Attack.TNT:
+                    StartCoroutine(TNTAttack());
+                    break;
+            }
+
+            return true;
+        }
+        
+        
+
+        /*
+        Vector2 rayStart = new Vector2(transform.position.x, transform.position.y + 0.75f);
+        //var hit = Physics2D.RaycastAll(rayStart, blueSide ? Vector2.right : Vector2.left, stats.range, attackObjetives);
+        //int hits = Physics2D.RaycastNonAlloc(rayStart, blueSide ? Vector2.right : Vector2.left, m_Results, stats.range, attackObjetives);
+        var hits = Physics2D.OverlapCircleNonAlloc(rayStart, stats.range, m_ResultsC, attackObjetives);
+        //Debug.DrawRay(rayStart, blueSide ? Vector2.right : Vector2.left, Color.red);
+   
         //Siempre se detectara a su misma
-        if(hit.Length <= 1)
+        if(hits<= 1)
         {
             return false;
         }
         if (_attacking)
             return true;
-        List<RaycastHit2D> colls = new List<RaycastHit2D>(hit);
-        colls.Sort((a, b) => Vector2.Distance(transform.position, a.transform.position).CompareTo(Vector2.Distance(transform.position, b.transform.position)));
-        for (int i = 0; i < colls.Count; i++)
+
+      */
+        //colls.Sort((a, b) => Vector2.Distance(transform.position, a.transform.position).CompareTo(Vector2.Distance(transform.position, b.transform.position)));
+
+
+        /*
+        for (int i = 0; i < hits; i++)
         {
-            //si son unidades enemigas vivas atacarlas, si no seguir buscando un objetivo
-            if (colls[i].transform.CompareTag("BlockUnit"))
+            var hit_t = m_ResultsC[i].transform;
+            if (hit_t.CompareTag("BlockUnit"))
             {
-                var minion = colls[i].transform.gameObject.GetComponentInParent<MinionController>();
+                var minion = hit_t.gameObject.GetComponentInParent<MinionController>();
                 if (minion.IsDead())
                     continue;
                 if (minion.blueSide == blueSide)
                     continue;
-                switch (stats.attackType)
-                {
-                    case Attack.Melee:
-                        StartCoroutine(MeleeSingleAttack(minion));
-                        break;
-                    case Attack.Arrow:
-                        StartCoroutine(ArrowAttack());
-                        break;
-                    case Attack.TNT:
-                        StartCoroutine(TNTAttack());
-                        break;
-                }
-             
-                break;
-            }
-            else if (colls[i].transform.CompareTag("Building"))
+            } else if (hit_t.CompareTag("Building"))
             {
-                var tower = colls[i].transform.gameObject.GetComponentInParent<Tower>();
+                var tower = hit_t.gameObject.GetComponentInParent<Tower>();
                 if (tower.IsDestroyed())
                     continue;
                 if (tower.blueSide == blueSide)
                     continue;
-                switch (stats.attackType)
-                {
-                    case Attack.Melee:
-                        StartCoroutine(MeleeSingleAttack(tower));
-                        break;
-                    case Attack.Arrow:
-                        StartCoroutine(ArrowAttack());
-                        break;
-                    case Attack.TNT:
-                        StartCoroutine(TNTAttack());
-                        break;
-                }
-
-                break;
+            }
+            float distance = Vector2.Distance(transform.position, hit_t.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestIndex = i;
+                closestT = hit_t;
             }
         }
 
-        return true;
+        if (closestIndex == -1 || closestT == null)
+        {
+            return false;
+        }*/
+        /*
+        if (closestT.CompareTag("BlockUnit"))
+        {
+            switch (stats.attackType)
+            {
+                case Attack.Melee:
+                    var minion = closestT.gameObject.GetComponentInParent<MinionController>();
+                    StartCoroutine(MeleeSingleAttack(minion));
+                    break;
+                case Attack.Arrow:
+                    StartCoroutine(ArrowAttack());
+                    break;
+                case Attack.TNT:
+                    StartCoroutine(TNTAttack());
+                    break;
+            }
+        }
+        else if (closestT.CompareTag("Building"))
+        {
+            switch (stats.attackType)
+            {
+                case Attack.Melee:
+                    var tower = closestT.transform.gameObject.GetComponentInParent<Tower>();
+                    StartCoroutine(MeleeSingleAttack(tower));
+                    break;
+                case Attack.Arrow:
+                    StartCoroutine(ArrowAttack());
+                    break;
+                case Attack.TNT:
+                    StartCoroutine(TNTAttack());
+                    break;
+            }
+
+        }
+
+        return true;*/
     }
 
 
@@ -216,7 +375,7 @@ public class MinionController : Poolable
             yield return new WaitForSeconds(0.05f);
             _dead = true;
             Death();
-            yield return new WaitForSeconds(animator.deathTime);
+            yield return new WaitForSeconds(AnimationManager.deathTime);
             //Destroy(gameObject);
             Remove();
         }
@@ -232,16 +391,23 @@ public class MinionController : Poolable
     {
         return _dead;
     }
-    private void Movement()
+    private void Movement(Transform closest)
     {
 
         if (_attacking || _dead)
             return;
-        Vector2 traslation = new Vector2(Speed * Time.fixedDeltaTime, 0);
+        Vector2 traslation = new Vector2(Speed * Time.deltaTime, 0);
         if (!blueSide)
             traslation *= -1;
-        rb.MovePosition((Vector2)transform.position + traslation);
-    
+        //rb.MovePosition((Vector2)transform.position + traslation);
+        transform.Translate(traslation);
+        if(closest == null)
+            return;
+        if (Vector2.Distance(transform.position, closest.position) < allyDetectDistnace)
+        {
+            transform.position = new Vector3(closest.position.x + (blueSide ? -allyDetectDistnace : allyDetectDistnace),
+                transform.position.y, transform.position.z);
+        }
     }
 
     /*

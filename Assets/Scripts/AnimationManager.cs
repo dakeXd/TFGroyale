@@ -8,11 +8,20 @@ public class AnimationManager : MonoBehaviour
     private Animator _animator;
     private SpriteRenderer _renderer;
 
-    private readonly string idle = "Idle";
-    private readonly string move = "Move";
-    private readonly string attack = "Attack";
-    private readonly string death = "Death";
-    public readonly float deathTime = 1.82f;
+    private const string idle = "Idle";
+    private const string move = "Move";
+    private const string attack = "Attack";
+    private const string death = "Death";
+    private const string staticState = "Static";
+    public const float deathTime = 1.82f;
+
+    public bool isStatic = false;
+    private static readonly int Static1 = Animator.StringToHash(staticState);
+    private static readonly int Death1 = Animator.StringToHash(death);
+    private static readonly int Move = Animator.StringToHash(move);
+    private static readonly int Attack1 = Animator.StringToHash(attack);
+    private static readonly int Idle1 = Animator.StringToHash(idle);
+
     void Awake()
     {
         _animator = gameObject.GetComponent<Animator>();
@@ -27,38 +36,56 @@ public class AnimationManager : MonoBehaviour
     [ContextMenu("Death")]
     public void Death()
     {
-        ResetTriggers();
-        _animator.SetTrigger(death);
-        Invoke(nameof(Hide), deathTime);
+        if (!isStatic)
+        {
+            ResetTriggers();
+            _animator.SetTrigger(Death1);
+            Invoke(nameof(Hide), deathTime);
+        }
+        else
+        {
+            Hide();
+        }
+     
+     
     }
 
     [ContextMenu("Idle")]
     public void Idle()
     {
-        ResetTriggers();
-        _animator.SetTrigger(idle);
+        if (!isStatic)
+        {
+            ResetTriggers();
+            _animator.SetTrigger(Idle1);
+        }
     }
 
     [ContextMenu("Walk")]
     public void Walk()
     {
-        ResetTriggers();
-        _animator.SetTrigger(move);
+        if (!isStatic)
+        {
+            ResetTriggers();
+            _animator.SetTrigger(Move);
+        }
     }
 
     [ContextMenu("Attack")]
     public void Attack()
     {
-        ResetTriggers();
-        _animator.SetTrigger(attack);
+        if (!isStatic)
+        {
+            ResetTriggers();
+            _animator.SetTrigger(Attack1);
+        }
     }
 
     private void ResetTriggers()
     {
-        _animator.ResetTrigger(idle);
-        _animator.ResetTrigger(attack);
-        _animator.ResetTrigger(move);
-        _animator.ResetTrigger(death);
+        _animator.ResetTrigger(Idle1);
+        _animator.ResetTrigger(Attack1);
+        _animator.ResetTrigger(Move);
+        _animator.ResetTrigger(Death1);
     }
 
     [ContextMenu("Damage")]
@@ -75,5 +102,16 @@ public class AnimationManager : MonoBehaviour
     private void Hide()
     {
         _renderer.color = new Color(0f, 0f, 0f, 0f);
+    }
+
+    public void Show()
+    {
+        _renderer.color = Color.white;
+    }
+
+    public void SetStatic(bool visualsActive)
+    {
+        isStatic = !visualsActive;
+        _animator.SetBool(Static1, isStatic);
     }
 }

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class SideManager : MonoBehaviour
 {
     [NonSerialized] public SideState state;
+    [NonSerialized] public bool visualActive = true;
     public Tower tower;
     public bool blueSide;
     [Header("Scene components")]
@@ -84,7 +85,8 @@ public class SideManager : MonoBehaviour
             state.gold += goldAmounts[state.goldMineLV];
             if(goldText!=null)
                 goldText.text = state.gold.ToString();
-            StartCoroutine(GoldSpawn());
+            if(visualActive)
+                StartCoroutine(GoldSpawn());
         } while (!_defeated);
     }
     
@@ -133,19 +135,20 @@ public class SideManager : MonoBehaviour
         minion.transform.rotation = spawnPoint1.transform.rotation;
         minion.stats = minionStats[index];
         minion.blueSide = blueSide;
+        minion.visualsActive = visualActive;
         if (!blueSide)
             minion.transform.localScale = new Vector3(-1, 1, 1);
         int scale = blueSide ? 1 : -1;
         if(minion.stats.attackType != Attack.Melee)
         {
-            minion.transform.Translate(new Vector3(UnityEngine.Random.Range(-0.05f, -0.15f) * scale, 0, 0));
+            minion.transform.Translate(new Vector3(UnityEngine.Random.Range(-0.03f, -0.05f) * scale, 0, 0));
         }
         else
         {
-            minion.transform.Translate(new Vector3(UnityEngine.Random.Range(0.05f, 0.15f) * scale, 0, 0));
+            minion.transform.Translate(new Vector3(UnityEngine.Random.Range(0.03f, 0.05f) * scale, 0, 0));
         }
         minion.name = minionStats[index].name + "_" + (blueSide ? "blue" : "red");
-        minion.UpdateAnimator();
+        minion.UpdatePooledParameters();
         OnMinionSpawn?.Invoke(minion);
     }
 

@@ -11,8 +11,8 @@ public class GeneticManager : MonoBehaviour
 {
     public bool learn = true;
     public GameInstance gameInstancePrefab;
-    private const int InstanceCount = 150, SizeX = 25, SizeY = 15, RowSize = 10, PoblationSize = 50;
-    private readonly int[] Layers = new int[] { 15, 16, 7 };
+    private const int InstanceCount = 510, SizeX = 25, SizeY = 15, RowSize = 10, PoblationSize = 170;
+    public static readonly int[] Layers = new int[] { 15, 40, 30, 7 };
     public List<GameInstance> instances;
     public List<GeneticNetwork> enemyAI1, enemyAI2, enemyAI3;
     private GeneticNetwork bestA1, bestA2, bestA3;
@@ -38,7 +38,7 @@ public class GeneticManager : MonoBehaviour
     [SerializeField] private int nodesMutationAmount = 2;
     private IEnumerator Start()
     {
-        Time.timeScale = 3;
+        Time.timeScale = 4f;
         enemyAI1 = new List<GeneticNetwork>(PoblationSize);
         enemyAI2 = new List<GeneticNetwork>(PoblationSize);
         enemyAI3 = new List<GeneticNetwork>(PoblationSize);
@@ -48,7 +48,7 @@ public class GeneticManager : MonoBehaviour
             int row = 0;
             int column = 0;
             float offsetX = -RowSize * SizeX / 2f;
-            float offsetY = -(InstanceCount/RowSize) * SizeY / 2f;
+            float offsetY = 0;
             for (int i = 0; i < InstanceCount; i++)
             {
                 instances.Add(Instantiate(gameInstancePrefab, new Vector3(row * SizeX + offsetX, column * SizeY + offsetY, 0), Quaternion.identity, transform));
@@ -62,6 +62,7 @@ public class GeneticManager : MonoBehaviour
                 yield return null;
             }
             FirstGeneration();
+            
             StartCoroutine(Training());
         }
        
@@ -88,6 +89,7 @@ public class GeneticManager : MonoBehaviour
                 SetTrainingEnemy(i, true);
                 yield return new WaitForSeconds(iterationTime);
                 UpdateFitnesses();
+                Debug.Log("New training with AI " + generation + "_" + i);
             }
             Sort();
             Debug.Log("Completed generation " + generation);
@@ -116,12 +118,14 @@ public class GeneticManager : MonoBehaviour
             NextGeneration(0);
             NextGeneration(1);
             NextGeneration(2);
+            UpdateAIs();
         }
         
     }
     
     private void Sort()
     {
+        Debug.Log("Sorting");
         enemyAI1.Sort((a, b) => b.fitness.CompareTo(a.fitness));
         enemyAI2.Sort((a, b) => b.fitness.CompareTo(a.fitness));
         enemyAI3.Sort((a, b) => b.fitness.CompareTo(a.fitness));
@@ -176,34 +180,34 @@ public class GeneticManager : MonoBehaviour
         for (int i = 0; i < PoblationSize; i++)
         {
             
-            var net = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
+            var net = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
             foreach (var layer in net.layers)
             {
                 layer.InitRandomWeights(false);
             }
             enemyAI1.Add(net);
             instances[instance].blueInput = new EnemyNeuralNetwork(net);
-            instances[instance].AI_Type = 0;
+            instances[instance].AI_Type = 1;
             instance++;
             
-            var net2 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
+            var net2 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
             foreach (var layer in net2.layers)
             {
                 layer.InitRandomWeights(false);
             }
             enemyAI2.Add(net2);
             instances[instance].blueInput = new EnemyNeuralNetwork(net2);
-            instances[instance].AI_Type = 1;
+            instances[instance].AI_Type = 2;
             instance++;
             
-            var net3 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
+            var net3 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
             foreach (var layer in net3.layers)
             {
                 layer.InitRandomWeights(false);
             }
             enemyAI3.Add(net3);
             instances[instance].blueInput = new EnemyNeuralNetwork(net3);
-            instances[instance].AI_Type = 2;
+            instances[instance].AI_Type = 3;
             instance++;
         }
         //Load prev data if existent
@@ -211,16 +215,35 @@ public class GeneticManager : MonoBehaviour
         ReadNetworks(1);
         ReadNetworks(2);
         GetBestNetworks();
-      
+    }
+
+    public void UpdateAIs()
+    {
+        int instance = 0;
+        for (int i = 0; i < PoblationSize; i++)
+        {
+            instances[instance].blueInput = new EnemyNeuralNetwork(enemyAI1[i]);
+            instances[instance].AI_Type = 1;
+            instance++;
+            
+            instances[instance].blueInput = new EnemyNeuralNetwork(enemyAI2[i]);
+            instances[instance].AI_Type = 2;
+            instance++;
+            
+            instances[instance].blueInput = new EnemyNeuralNetwork(enemyAI3[i]);
+            instances[instance].AI_Type = 3;
+            instance++;
+
+        }
     }
 
     private void GetBestNetworks()
     {
-        bestA1 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
+        bestA1 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
         bestA1.Decode(enemyAI1[0].Encode());
-        bestA2 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
+        bestA2 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
         bestA2.Decode(enemyAI2[0].Encode());
-        bestA3 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
+        bestA3 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
         bestA3.Decode(enemyAI3[0].Encode());
     }
     #region Breeding
@@ -322,8 +345,8 @@ public class GeneticManager : MonoBehaviour
     
     private GeneticNetwork[] Breed(GeneticNetwork mother, GeneticNetwork father)
     {
-        GeneticNetwork child1 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
-        GeneticNetwork child2 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.ReLU);
+        GeneticNetwork child1 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
+        GeneticNetwork child2 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
 
         double[] motherChromosome = mother.Encode();
         double[] fatherChromosome = father.Encode();
@@ -431,15 +454,15 @@ public class GeneticManager : MonoBehaviour
         {
             case 0:
                 network = enemyAI1;
-                file = "AI1.txt";
+                file = "Assets/Presets/AI1.txt";
                 break;
             case 1:
                 network = enemyAI2;
-                file = "AI2.txt";
+                file = "Assets/Presets/AI2.txt";
                 break;
             case 2:
                 network = enemyAI3;
-                file = "AI3.txt";
+                file = "Assets/Presets/AI3.txt";
                 break;
             default:
                 Debug.LogError("Inexpected AI index " + ai);

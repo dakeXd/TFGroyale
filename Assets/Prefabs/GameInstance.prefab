@@ -171,7 +171,11 @@ MonoBehaviour:
   blueSideStart: {fileID: 577264031321464438}
   redSideStart: {fileID: 1668384502694973844}
   AIUpdateTime: 0.5
+  AI_Type: -1
   playerInput: 0
+  AI1: {fileID: 0}
+  AI2: {fileID: 0}
+  AI3: {fileID: 0}
 --- !u!1 &933849968925344000
 GameObject:
   m_ObjectHideFlags: 0
@@ -1006,7 +1010,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6e0aaff5dd3ae1c4b8662899cd30ee78, type: 3}
   - {fileID: 21300000, guid: 58fc7d74eb3e7074aac3f9b167124442, type: 3}
   - {fileID: 21300000, guid: 38cfe5ee4ad4ead4799607fd8baccfcb, type: 3}
-  minionPrefab: {fileID: 852023446896448354, guid: ac3a20c94d50a7c46a25ed98f26e62f6, type: 3}
   minionStats:
   - {fileID: 11400000, guid: 8332654ec37bd0f4e8b194a2d8f2cb2d, type: 2}
   - {fileID: 11400000, guid: a27aa4e32c99b4942968dfebd426ef47, type: 2}
@@ -1014,7 +1017,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a119c6be668df6f43912aec83b08f7b5, type: 2}
   - {fileID: 11400000, guid: fa8ff9c51e9fa6a4986d0e55a03dd087, type: 2}
   goldAmounts: 1e0000002d0000003c000000
-  levelUpCosts: 2c01000058020000
+  levelUpCosts: fa000000f4010000
   goldAnim: {fileID: 336327096055589032}
   goldTime: 1.5
   goldAnimTime: 0.51
@@ -8145,7 +8148,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6e0aaff5dd3ae1c4b8662899cd30ee78, type: 3}
   - {fileID: 21300000, guid: 58fc7d74eb3e7074aac3f9b167124442, type: 3}
   - {fileID: 21300000, guid: 38cfe5ee4ad4ead4799607fd8baccfcb, type: 3}
-  minionPrefab: {fileID: 852023446896448354, guid: ac3a20c94d50a7c46a25ed98f26e62f6, type: 3}
   minionStats:
   - {fileID: 11400000, guid: 8332654ec37bd0f4e8b194a2d8f2cb2d, type: 2}
   - {fileID: 11400000, guid: a27aa4e32c99b4942968dfebd426ef47, type: 2}
@@ -8153,7 +8155,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a119c6be668df6f43912aec83b08f7b5, type: 2}
   - {fileID: 11400000, guid: fa8ff9c51e9fa6a4986d0e55a03dd087, type: 2}
   goldAmounts: 1e0000002d0000003c000000
-  levelUpCosts: 2c01000058020000
+  levelUpCosts: fa000000f4010000
   goldAnim: {fileID: 6876599524425741310}
   goldTime: 1.5
   goldAnimTime: 0.51

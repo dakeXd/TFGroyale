@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bodyBlueSide: {fileID: 9100000, guid: b72aa0053dfe8ea41beb1bfdf210e7c5, type: 2}
   bodyRedSide: {fileID: 9100000, guid: ada74b054eb992c478324151bd2a498e, type: 2}
-  maxLife: 250
+  maxLife: 200
   attack: 50
   range: 0.55
-  speed: 0.5
+  speed: 0.8
   goldCost: 60
   attackType: 0
   codification: 0.2

@@ -413,9 +413,9 @@ RectTransform:
   - {fileID: 691010797}
   m_Father: {fileID: 1216685315}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 324.5, y: -64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 85, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &387638625
@@ -773,9 +773,9 @@ RectTransform:
   - {fileID: 892602727}
   m_Father: {fileID: 1216685315}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 699.5, y: -64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 85, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &545366607
@@ -1842,9 +1842,9 @@ RectTransform:
   - {fileID: 615092735}
   m_Father: {fileID: 1216685315}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 449.5, y: -64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 85, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &854442174
@@ -2337,9 +2337,9 @@ RectTransform:
   - {fileID: 1698545523}
   m_Father: {fileID: 1216685315}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 824.5, y: -64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 85, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &905799603
@@ -2546,9 +2546,9 @@ RectTransform:
   - {fileID: 739708386}
   m_Father: {fileID: 1216685315}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 199.5, y: -64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 85, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &967525874
@@ -2738,7 +2738,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1003250786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2905,9 +2905,9 @@ RectTransform:
   - {fileID: 1948180496}
   m_Father: {fileID: 1216685315}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 574.5, y: -64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 85, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1166788535
@@ -3613,7 +3613,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1625092438
 Transform:
   m_ObjectHideFlags: 0
@@ -3645,15 +3645,15 @@ MonoBehaviour:
   gameInstancePrefab: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
   instances: []
   stop: 0
-  iterationTime: 90
+  iterationTime: 80
   parentScale: 0.85
   unbiasedMutationProb: 0.4
-  biasedMutationProb: 0.1
-  nodeMutationProb: 0.1
-  crossoverWeightsProb: 0.06
-  crossoverNodesProb: 0.06
-  mutationProb: 0.06
-  nodesMutationAmount: 2
+  biasedMutationProb: 0.2
+  nodeMutationProb: 0.2
+  crossoverWeightsProb: 0.1
+  crossoverNodesProb: 0.1
+  mutationProb: 0.1
+  nodesMutationAmount: 3
 --- !u!1 &1678853678
 GameObject:
   m_ObjectHideFlags: 0
@@ -4315,7 +4315,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 894437250942179416, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1785535115193583243, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
       propertyPath: goldText
@@ -4329,6 +4329,30 @@ PrefabInstance:
       propertyPath: goldCostText
       value: 
       objectReference: {fileID: 891242672}
+    - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: AI1
+      value: 
+      objectReference: {fileID: 4900000, guid: bdb38ce2d622b5144b1a09b7b3b22104, type: 3}
+    - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: AI2
+      value: 
+      objectReference: {fileID: 4900000, guid: f967c1d2260d92b4bb4644fafc06f3b1, type: 3}
+    - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: AI3
+      value: 
+      objectReference: {fileID: 4900000, guid: 745338c2b44ff0743818cddcba2d9f7f, type: 3}
+    - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: AI_Type
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: playerInput
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: visualsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3056823613069748821, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8
@@ -4373,6 +4397,18 @@ PrefabInstance:
       propertyPath: goldText
       value: 
       objectReference: {fileID: 1678853680}
+    - target: {fileID: 4528739623456790809, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642513029927388653, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9052114713076529006, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
