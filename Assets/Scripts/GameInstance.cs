@@ -19,7 +19,7 @@ public class GameInstance : MonoBehaviour
     public bool playerInput = false;
     private float _nextUpdate = 0f;
     [NonSerialized] public List<MinionController> blueSideMinions, redSideMinions;
-    public TextAsset AI1, AI2, AI3;
+    public TextAsset AI1, AI2, AI3, AI4;
     
     private void Awake()
     {
@@ -59,6 +59,10 @@ public class GameInstance : MonoBehaviour
             case 2:
 
                 AiText = AI3.text;
+                break;
+            case 3:
+
+                AiText = AI4.text;
                 break;
             default:
                 Debug.LogError("Inexpected AI index " + ai);

@@ -11,11 +11,11 @@ public class GeneticManager : MonoBehaviour
 {
     public bool learn = true;
     public GameInstance gameInstancePrefab;
-    private const int InstanceCount = 510, SizeX = 25, SizeY = 15, RowSize = 10, PoblationSize = 170;
+    private const int InstanceCount = 500, SizeX = 25, SizeY = 15, RowSize = 10, PoblationSize = 125;
     public static readonly int[] Layers = new int[] { 15, 40, 30, 7 };
     public List<GameInstance> instances;
-    public List<GeneticNetwork> enemyAI1, enemyAI2, enemyAI3;
-    private GeneticNetwork bestA1, bestA2, bestA3;
+    public List<GeneticNetwork> enemyAI1, enemyAI2, enemyAI3, enemyAI4;
+    private GeneticNetwork bestA1, bestA2, bestA3, bestA4;
     private int lastEnemySet = -1, generation = 0;
     public bool stop = false;
 
@@ -42,6 +42,7 @@ public class GeneticManager : MonoBehaviour
         enemyAI1 = new List<GeneticNetwork>(PoblationSize);
         enemyAI2 = new List<GeneticNetwork>(PoblationSize);
         enemyAI3 = new List<GeneticNetwork>(PoblationSize);
+        enemyAI4 = new List<GeneticNetwork>(PoblationSize);
         instances = new List<GameInstance>(InstanceCount);
         if (learn)
         {
@@ -84,7 +85,7 @@ public class GeneticManager : MonoBehaviour
         {
             generation++;
             ResetFitnesses();
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 SetTrainingEnemy(i, true);
                 yield return new WaitForSeconds(iterationTime);
@@ -111,13 +112,21 @@ public class GeneticManager : MonoBehaviour
                 if(((EnemyNeuralNetwork)instance.blueInput).network.Equals(enemyAI3[0]))
                     Debug.Log(instance.gameObject.name);
             }
+            Debug.Log("Best A4: " + enemyAI4[0].fitness);
+            foreach (var instance in instances)
+            {
+                if(((EnemyNeuralNetwork)instance.blueInput).network.Equals(enemyAI4[0]))
+                    Debug.Log(instance.gameObject.name);
+            }
             WriteNetworks(5, 0);
             WriteNetworks(5, 1);
             WriteNetworks(5, 2);
+            WriteNetworks(5, 3);
             GetBestNetworks();
             NextGeneration(0);
             NextGeneration(1);
             NextGeneration(2);
+            NextGeneration(3);
             UpdateAIs();
         }
         
@@ -129,6 +138,7 @@ public class GeneticManager : MonoBehaviour
         enemyAI1.Sort((a, b) => b.fitness.CompareTo(a.fitness));
         enemyAI2.Sort((a, b) => b.fitness.CompareTo(a.fitness));
         enemyAI3.Sort((a, b) => b.fitness.CompareTo(a.fitness));
+        enemyAI4.Sort((a, b) => b.fitness.CompareTo(a.fitness));
     }
     private void UpdateFitnesses()
     {
@@ -160,6 +170,9 @@ public class GeneticManager : MonoBehaviour
                     break;
                 case 3:
                     instance.redInput = new EnemyNeuralNetwork(bestA3);
+                    break;
+                case 4:
+                    instance.redInput = new EnemyNeuralNetwork(bestA4);
                     break;
                 default:
                     instance.redInput = new BaseAI();
@@ -209,11 +222,22 @@ public class GeneticManager : MonoBehaviour
             instances[instance].blueInput = new EnemyNeuralNetwork(net3);
             instances[instance].AI_Type = 3;
             instance++;
+            
+            var net4 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
+            foreach (var layer in net4.layers)
+            {
+                layer.InitRandomWeights(false);
+            }
+            enemyAI4.Add(net4);
+            instances[instance].blueInput = new EnemyNeuralNetwork(net4);
+            instances[instance].AI_Type = 4;
+            instance++;
         }
         //Load prev data if existent
         ReadNetworks(0);
         ReadNetworks(1);
         ReadNetworks(2);
+        ReadNetworks(3);
         GetBestNetworks();
     }
 
@@ -234,6 +258,9 @@ public class GeneticManager : MonoBehaviour
             instances[instance].AI_Type = 3;
             instance++;
 
+            instances[instance].blueInput = new EnemyNeuralNetwork(enemyAI4[i]);
+            instances[instance].AI_Type = 4;
+            instance++;
         }
     }
 
@@ -245,6 +272,8 @@ public class GeneticManager : MonoBehaviour
         bestA2.Decode(enemyAI2[0].Encode());
         bestA3 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
         bestA3.Decode(enemyAI3[0].Encode());
+        bestA4 = new GeneticNetwork(Layers, Activation.Sigmoid, Activation.Sigmoid);
+        bestA4.Decode(enemyAI4[0].Encode());
     }
     #region Breeding
 
@@ -294,6 +323,9 @@ public class GeneticManager : MonoBehaviour
                 break;
             case 2:
                 parentNetwork = enemyAI3;
+                break;
+            case 3:
+                parentNetwork = enemyAI4;
                 break;
             default:
                 Debug.LogError("Inexpected AI index " + aiIndex);
@@ -411,15 +443,19 @@ public class GeneticManager : MonoBehaviour
         {
             case 0:
                 network = enemyAI1;
-                file = "AI1.txt";
+                file = "Assets/Presets/AI1.txt";
                 break;
             case 1:
                 network = enemyAI2;
-                file = "AI2.txt";
+                file = "Assets/Presets/AI2.txt";
                 break;
             case 2:
                 network = enemyAI3;
-                file = "AI3.txt";
+                file = "Assets/Presets/AI3.txt";
+                break;
+            case 3:
+                network = enemyAI4;
+                file = "Assets/Presets/AI4.txt";
                 break;
             default:
                 Debug.LogError("Inexpected AI index " + ai);
@@ -463,6 +499,10 @@ public class GeneticManager : MonoBehaviour
             case 2:
                 network = enemyAI3;
                 file = "Assets/Presets/AI3.txt";
+                break;
+            case 3:
+                network = enemyAI4;
+                file = "Assets/Presets/AI4.txt";
                 break;
             default:
                 Debug.LogError("Inexpected AI index " + ai);

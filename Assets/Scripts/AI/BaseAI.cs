@@ -196,10 +196,10 @@ public class NetworkInput
     public float a1, a2, a3, a4, a5;
     public float mineLv;
 
-    public float[] AsArray()
+    /*public float[] AsArray()
     {
         return new float[] { gold, enemyGold, allyDistance, enemyDistance, e1, e2, e3, e4, e5, a1, a2, a3, a4, a5, mineLv}; 
-    }
+    }*/
     
     public double[] AsDoubleArray()
     {
@@ -219,7 +219,7 @@ public class NetworkInput
         a4  = enemys[3];
         a5  = enemys[4];
     }
-    public void FromArray(float[] inputs)
+    /*public void FromArray(float[] inputs)
     {
         gold = inputs[0];
         enemyGold = inputs[1];
@@ -236,5 +236,5 @@ public class NetworkInput
         a4  = inputs[12];
         a5  = inputs[13];
         mineLv = inputs[14];
-    }
+    }*/
 }

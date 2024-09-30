@@ -4342,8 +4342,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4900000, guid: 745338c2b44ff0743818cddcba2d9f7f, type: 3}
     - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: AI4
+      value: 
+      objectReference: {fileID: 4900000, guid: 26ecfc2054cbeea4b9f32ec867639dac, type: 3}
+    - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
       propertyPath: AI_Type
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2291006513106389552, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
       propertyPath: playerInput
