@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using AI.Network;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class GameInstance : MonoBehaviour
@@ -12,6 +13,7 @@ public class GameInstance : MonoBehaviour
     public bool visualsActive = false;
     public List<GameObject> visuals;
     public SideManager blueSide, redSide;
+    public GameObject win, lose;
     public InputDriver blueInput, redInput;
     public Transform blueSideStart, redSideStart;
     public float AIUpdateTime = 0.5f;
@@ -32,6 +34,26 @@ public class GameInstance : MonoBehaviour
             redInput = new BaseAI();
         if (playerInput && AI_Type >= 0)
         {
+            var net = ReadNetworks(AI_Type);
+            redInput = new EnemyNeuralNetwork(net);
+        }else if (playerInput)
+        {
+     
+            switch (MenuManager.dificulty)
+            {
+                case 0:
+                    AI_Type = 2;
+                    break;
+                case 1:
+                    AI_Type = 0;
+                    break;
+                case 2:
+                    AI_Type = 1;
+                    break;
+                case 3:
+                    AI_Type = 3;
+                    break;
+            }
             var net = ReadNetworks(AI_Type);
             redInput = new EnemyNeuralNetwork(net);
         }
@@ -147,12 +169,17 @@ public class GameInstance : MonoBehaviour
             if (CheckEnd())
             {
                 //Debug.Log("Stop updating");
+                bool win = redSide.finished;
                 blueSide.Finish();
                 redSide.Finish();
                
                 _nextUpdate = Single.MaxValue; 
                 DeleteUnits();
                 //Invoke(nameof(Reset), 1f);
+                if (playerInput)
+                {
+                    StartCoroutine(EndGamePlayer(win));
+                }
                 return;
             }
                 
@@ -168,6 +195,16 @@ public class GameInstance : MonoBehaviour
             //Si el juego esta acelerado la decision se tomara antes.
             _nextUpdate = Time.time + (AIUpdateTime / Time.timeScale);
         }
+    }
+
+    public IEnumerator EndGamePlayer(bool victory)
+    {
+        if(victory)
+            win.SetActive(true);
+        else
+            lose.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene(0);
     }
 
     private void DeleteUnits()
@@ -223,6 +260,7 @@ public class GameInstance : MonoBehaviour
     }
     public void CalculateInputs(  NetworkInput blue,   NetworkInput red)
     {
+        /*
         float blueFirstDistance = blueSideMinions.Count > 0
             ? Normalize(blueSideMinions[0].transform.position.x, blueSideStart.position.x, redSideStart.position.x)
             : 0;
@@ -233,6 +271,9 @@ public class GameInstance : MonoBehaviour
         float[] enemys = new float[5];
         for (int i = 0; i < 5; i++)
         {
+            allys[0] = Normalize(
+                blueSideMinions.Find((minion) => minion.stats.codification > 0.19f && minion.stats.codification < 0.21f)
+                    .transform.position.x, blueSideStart.position.x, redSideStart.position.x);
             if (i < blueSideMinions.Count)
                 allys[i] = blueSideMinions[i].stats.codification;
             else
@@ -242,23 +283,38 @@ public class GameInstance : MonoBehaviour
                 enemys[i] = redSideMinions[i].stats.codification;
             else
                 enemys[i] = 0;
+        }*/
+
+        float[] allysB = new float[5];
+        float[] enemysB = new float[5];
+    
+        for (int i = 0; i < 5; i++)
+        {
+            int index = i + 1;
+            var blueM = blueSideMinions.Find((minion) =>
+                minion.stats.codification > 0.19f * index && minion.stats.codification < 0.21f * index);
+            var redM = redSideMinions.Find((minion) =>
+                minion.stats.codification > 0.19f * index && minion.stats.codification < 0.21f * index);
+            allysB[i] = blueM == null ? 0 :  Normalize(blueM.transform.position.x, blueSideStart.position.x, redSideStart.position.x);
+            enemysB[i] = redM == null ? 0 :  Normalize(redM.transform.position.x, redSideStart.position.x, blueSideStart.position.x);
+            //enemysR[i] = blueM == null ? 0 :  Normalize(blueM.transform.position.x, blueSideStart.position.x, redSideStart.position.x);
+            //allysR[i] = redM == null ? 0 :  Normalize(redM.transform.position.x, redSideStart.position.x, blueSideStart.position.x);
         }
-        
         //blue
         blue.gold = Normalize(blueSide.state.gold, 0f, 1000f, true);
         blue.enemyGold = Normalize(redSide.state.gold, 0f, 1000f, true);
         blue.mineLv = Normalize(blueSide.state.goldMineLV, 0f, 2f);
-        blue.allyDistance = blueFirstDistance;
-        blue.enemyDistance = redFirstDistance;
-        blue.UnitsFromArray(allys, enemys);
+        blue.amountEnemys = Normalize( redSideMinions.Count, 0f, 6f);
+        blue.amountAllys = Normalize( blueSideMinions.Count, 0f, 6f);
+        blue.UnitsFromArray(allysB, enemysB);
         
         //red
         red.gold = Normalize(redSide.state.gold, 0f, 1000f, true);
         red.enemyGold = Normalize(blueSide.state.gold, 0f, 1000f, true);
         red.mineLv = Normalize(redSide.state.goldMineLV, 0f, 2f);
-        red.allyDistance = redFirstDistance;
-        red.enemyDistance = blueFirstDistance;
-        red.UnitsFromArray(enemys, allys);
+        red.amountEnemys = Normalize( blueSideMinions.Count, 0f, 6f);
+        red.amountAllys = Normalize( redSideMinions.Count, 0f, 6f);
+        red.UnitsFromArray(enemysB, allysB);
        
     }
     [ContextMenu("Update visuals")]

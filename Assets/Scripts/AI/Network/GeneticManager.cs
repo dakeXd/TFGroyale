@@ -85,7 +85,7 @@ public class GeneticManager : MonoBehaviour
         {
             generation++;
             ResetFitnesses();
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 4; i++)
             {
                 SetTrainingEnemy(i, true);
                 yield return new WaitForSeconds(iterationTime);
@@ -162,20 +162,20 @@ public class GeneticManager : MonoBehaviour
         {
             switch (learningIteration)
             {
-                case 1:
+                case 0:
                     instance.redInput = new EnemyNeuralNetwork(bestA1);
                     break;
-                case 2:
+                case 1:
                     instance.redInput = new EnemyNeuralNetwork(bestA2);
                     break;
-                case 3:
+                case 2:
                     instance.redInput = new EnemyNeuralNetwork(bestA3);
                     break;
-                case 4:
+                case 3:
                     instance.redInput = new EnemyNeuralNetwork(bestA4);
                     break;
                 default:
-                    instance.redInput = new BaseAI();
+                    Debug.LogError("Invalid enemy " + learningIteration);
                     break;
             }
 
@@ -518,6 +518,7 @@ public class GeneticManager : MonoBehaviour
         {
     
             var line = sr.ReadLine().Split(',');
+            Debug.Log(line);
             double[] coded = new double[line.Length];
             for (int i = 0; i < line.Length; i++)
             {

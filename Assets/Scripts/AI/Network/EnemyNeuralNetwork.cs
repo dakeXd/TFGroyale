@@ -15,7 +15,14 @@ public class EnemyNeuralNetwork :  InputDriver
     
     public AiAction ProcessInput(NetworkInput input)
     {
-        int output = network.GetMaxOutput(input.AsDoubleArray());
+        var arrayOut = input.AsDoubleArray();
+        /*string a = "Data: {";
+        for (int i = 0; i < arrayOut.Length; i++)
+        {
+            a += arrayOut[i].ToString("N2") + ", ";
+        }
+        Debug.Log(a);*/
+        int output = network.GetMaxOutput(arrayOut);
         return (AiAction) output;
     }
 
