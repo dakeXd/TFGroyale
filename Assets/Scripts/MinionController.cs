@@ -8,19 +8,15 @@ public class MinionController : Poolable
 
     public Minion stats;
     public AnimationManager animator;
-    public Rigidbody2D rb;
     public bool blueSide;
     private int _actualLife;
     public readonly float Speed = 1.7f; 
     public readonly float allyDetectDistnace = 0.5f;
     //private Vector3 _lastPos;
-    public LayerMask attackObjetives;
     private bool _dead, _moving, _attacking;
     //public Dynamite dynamitePrefab;
     private readonly float arrowTime = 0.5f;
     private readonly float dynamiteTime = 0.4f;
-    private RaycastHit2D[] m_Results = new RaycastHit2D[15];
-    private Collider2D[] m_ResultsC = new Collider2D[15];
     [NonSerialized] public bool visualsActive = true;
 
     private GameInstance _instance;
