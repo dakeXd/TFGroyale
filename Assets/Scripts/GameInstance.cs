@@ -42,16 +42,16 @@ public class GameInstance : MonoBehaviour
             switch (MenuManager.dificulty)
             {
                 case 0:
-                    AI_Type = 2;
+                    AI_Type = 3;
                     break;
                 case 1:
-                    AI_Type = 0;
+                    AI_Type = 2;
                     break;
                 case 2:
-                    AI_Type = 1;
+                    AI_Type = 0;
                     break;
                 case 3:
-                    AI_Type = 3;
+                    AI_Type = 1;
                     break;
             }
             var net = ReadNetworks(AI_Type);

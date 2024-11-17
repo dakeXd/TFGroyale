@@ -4939,6 +4939,10 @@ PrefabInstance:
       propertyPath: visualsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2459106083698158536, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3056823613069748821, guid: 5b3350a0ccc91c042bfe4ea004ae390c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8

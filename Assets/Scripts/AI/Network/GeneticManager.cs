@@ -20,7 +20,7 @@ public class GeneticManager : MonoBehaviour
     public bool stop = false;
 
     [Header("Breeding Variables")] [SerializeField]
-    private int iterationTime = 90;
+    private int iterationTime = 70;
     [Range(0f,1f)]
     [SerializeField] private float parentScale = 0.92f;
     [Range(0f, 1f)]
@@ -38,7 +38,7 @@ public class GeneticManager : MonoBehaviour
     [SerializeField] private int nodesMutationAmount = 2;
     private IEnumerator Start()
     {
-        Time.timeScale = 4f;
+        Time.timeScale = 2.3f;
         enemyAI1 = new List<GeneticNetwork>(PoblationSize);
         enemyAI2 = new List<GeneticNetwork>(PoblationSize);
         enemyAI3 = new List<GeneticNetwork>(PoblationSize);
@@ -139,6 +139,7 @@ public class GeneticManager : MonoBehaviour
         enemyAI2.Sort((a, b) => b.fitness.CompareTo(a.fitness));
         enemyAI3.Sort((a, b) => b.fitness.CompareTo(a.fitness));
         enemyAI4.Sort((a, b) => b.fitness.CompareTo(a.fitness));
+        Debug.Log(enemyAI1[0].fitness + ", " +enemyAI1[1].fitness  + ", " +enemyAI1[2].fitness+ ", " +enemyAI1[3].fitness);
     }
     private void UpdateFitnesses()
     {
